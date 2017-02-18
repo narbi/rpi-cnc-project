@@ -3,6 +3,8 @@
 # Author: Christina Skouloudi
 # Year: 2017
 
+sudo -s
+
 apt-get update -y
 apt-get upgrade -y
 apt-get install gcc golang electric-fence sudo git -y
@@ -57,5 +59,6 @@ export PATH=$PATH:/etc/xcompile/armv6l/bin
 export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/Documents/go
 
+cd ../../
 go get github.com/go-sql-driver/mysql
 go get github.com/mattn/go-shellwords
