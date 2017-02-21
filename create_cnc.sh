@@ -62,3 +62,9 @@ export GOPATH=$HOME/Documents/go
 cd ../../
 go get github.com/go-sql-driver/mysql
 go get github.com/mattn/go-shellwords
+
+# mirai/bot/scanner.c contains list of ip’s (ipv4_t get_random_ip(void);. 
+# This was modified to only parse 192.168.66 ips. 
+
+# mirai/bot/resolv.c 
+# addr.sin_addr.s_addr = INET_ADDR(127,0,0,1);
