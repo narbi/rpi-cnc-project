@@ -13,23 +13,68 @@ sudo apt-get update -y
 echo -e "What is the static IP you would you like to give to this device?" 
 read staticip
 
-# Install bind9 for DNS server
-sudo apt-get install bind9 bind9-docs dnsutils -y
-
 # Install dnsmasq for DNS server and Access Point 
-sudo apt-get install dnsmasq hostapd -y
-
-# Checking the Status of the Server
-if [[ "$(service bind9 status| grep 'ok')" != "" ] then
-echo "bind service is running\n"
+sudo apt-get install dnsutils dnsmasq hostapd -y
 
 # Create the records
 sudo echo 'search $domainname \n nameserver 127.0.0.1' >> /etc/resolv.conf
+sudo echo 'denyinterfaces wlan0' >> /etc/dhcpcd.conf  
+sudo echo 'allow-hotplug wlan0 \n iface wlan0 inet static \n address 172.24.1.1 \n netmask 255.255.255.0 \n network 172.24.1.0 \n broadcast 172.24.1.255
+\# wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf' >> /etc/network/interfaces
+sudo service dhcpcd restart
+sudo ifdown wlan0 
+sudo ifup wlan0
 
-# Append the zone in the file 
-sudo echo 'zone "$domainname"{type master;\n file "/etc/bind/$domianname";\n };' >> name.conf.local
-cat $domainname.zone
+# content to conf
+# This is the name of the WiFi interface we configured above
+interface=wlan0
 
-rndc reload $domainname
+# Use the nl80211 driver with the brcmfmac driver
+driver=nl80211
 
-echo "DNS Server setup completed."
+# This is the name of the network
+ssid=Pi3-AP
+
+# Use the 2.4GHz band
+hw_mode=g
+
+# Use channel 6
+channel=6
+
+# Enable 802.11n
+ieee80211n=1
+
+# Enable WMM
+wmm_enabled=1
+
+# Enable 40MHz channels with 20ns guard interval
+ht_capab=[HT40][SHORT-GI-20][DSSS_CCK-40]
+
+# Accept all MAC addresses
+macaddr_acl=0
+
+# Use WPA authentication
+auth_algs=1
+
+# Require clients to know the network name
+ignore_broadcast_ssid=0
+
+# Use WPA2
+wpa=2
+
+# Use a pre-shared key
+wpa_key_mgmt=WPA-PSK
+
+# The network passphrase
+wpa_passphrase=raspberry
+
+# Use AES, instead of TKIP
+rsn_pairwise=CCMP
+
+# >> /etc/hostapd/hostapd.conf
+
+#Check if it's working
+sudo /usr/sbin/hostapd /etc/hostapd/hostapd.conf
+
+#sudo nano /etc/default/hostapd and find the line #DAEMON_CONF="" and replace it with DAEMON_CONF="/etc/hostapd/hostapd.conf"
+
