@@ -2,6 +2,7 @@
 # Description: This script will setup a DNS server on a Respberry pi
 # Author: Christina Skouloudi
 # Year: 2017
+# https://frillip.com/using-your-raspberry-pi-3-as-a-wifi-access-point-with-hostapd/
 
 # Basics - Check connection, then update
 if [[ "$(ping -c 1 8.8.8.8 | grep '100% packet loss' )" != "" ]]; then
