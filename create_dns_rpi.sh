@@ -10,8 +10,11 @@ if [[ "$(ping -c 1 8.8.8.8 | grep '100% packet loss' )" != "" ]]; then
 sudo apt-get update -y
 
 #static IP addr to work as DHCP server
-echo -e "What is the static IP you would you like to give to this device?" 
+echo -e "What is the static IP you would you like to give to this device? (eg. 192.168.66.100)" 
 read staticip
+
+# networkip = awk  '$staticip {gsub(".[0-9]*",".0",$4)}';
+# broadcastip = awk  '$staticip {gsub(".[0-9]*",".255",$4)}';
 
 # Install dnsmasq for DNS server and Access Point 
 sudo apt-get install dnsutils dnsmasq hostapd -y
@@ -19,13 +22,16 @@ sudo apt-get install dnsutils dnsmasq hostapd -y
 # Create the records
 sudo echo 'search $domainname \n nameserver 127.0.0.1' >> /etc/resolv.conf
 sudo echo 'denyinterfaces wlan0' >> /etc/dhcpcd.conf  
-sudo echo 'allow-hotplug wlan0 \n iface wlan0 inet static \n address 172.24.1.1 \n netmask 255.255.255.0 \n network 172.24.1.0 \n broadcast 172.24.1.255
-\# wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf' >> /etc/network/interfaces
+sudo echo 'allow-hotplug wlan0 \n iface wlan0 inet static \n address $staticip \n netmask 255.255.255.0 \n network $networkip \n broadcast $broadcastip
+\n wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf' >> /etc/network/interfaces
 sudo service dhcpcd restart
 sudo ifdown wlan0 
 sudo ifup wlan0
 
-# content to conf
+# sed * 15 times (settings below)
+# sed -i 's/ugly/beautiful/g' /etc/hostapd/hostapd.conf
+
+# content to hostapd.conf
 # This is the name of the WiFi interface we configured above
 interface=wlan0
 
