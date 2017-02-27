@@ -37,7 +37,7 @@ if [[ $prompt =~ [yY](es)* ]] then
     # Create the records
     # sudo echo 'search $domainname \n nameserver 127.0.0.1' >> /etc/resolv.conf
     sudo echo 'denyinterfaces wlan0' >> /etc/dhcpcd.conf  
-    sudo echo 'allow-hotplug wlan0 \n iface wlan0 inet static \n address $staticip \n netmask 255.255.255.0 \n network $networkip \n broadcast $broadcastip
+    sudo echo -e 'allow-hotplug wlan0 \n iface wlan0 inet static \n address $staticip \n netmask 255.255.255.0 \n network $networkip \n broadcast $broadcastip
     \n wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf' >> /etc/network/interfaces
     sudo service dhcpcd restart
     sudo ifdown wlan0 
@@ -45,7 +45,7 @@ if [[ $prompt =~ [yY](es)* ]] then
 
     # content to hostapd.conf
     # sudo touch /etc/hostapd/hostapd.conf
-    echo "\# WiFi Interface \n interface=wlan0 \n \# Use the nl80211 driver with the brcmfmac driver \n driver=nl80211 \n \# This is the name of the network \n ssid=$myssid \n \# Use the 2.4GHz band \n hw_mode=g \n \# Use channel 6 \n channel=6 \n \# Enable 802.11n \n ieee80211n=1 \n \# Enable WMM \n wmm_enabled=1 \n \# Enable 40MHz channels with 20ns guard interval \n  ht_capab=[HT40][SHORT-GI-20][DSSS_CCK-40] \n \# Accept all MAC addresses \n macaddr_acl=0 \n \# Use WPA authentication \n auth_algs=1 \n \# Require clients to know the network name \n ignore_broadcast_ssid=0 \n \# Use WPA2 \n wpa=2 \n \# Use a pre-shared key \n wpa_key_mgmt=WPA-PSK \n \# The network passphrase \n wpa_passphrase=$wpapass \n \# Use AES, instead of TKIP \n rsn_pairwise=CCMP \n" > /etc/hostapd/hostapd.conf
+    echo -e "\# WiFi Interface \n interface=wlan0 \n \# Use the nl80211 driver with the brcmfmac driver \n driver=nl80211 \n \# This is the name of the network \n ssid=$myssid \n \# Use the 2.4GHz band \n hw_mode=g \n \# Use channel 6 \n channel=6 \n \# Enable 802.11n \n ieee80211n=1 \n \# Enable WMM \n wmm_enabled=1 \n \# Enable 40MHz channels with 20ns guard interval \n  ht_capab=[HT40][SHORT-GI-20][DSSS_CCK-40] \n \# Accept all MAC addresses \n macaddr_acl=0 \n \# Use WPA authentication \n auth_algs=1 \n \# Require clients to know the network name \n ignore_broadcast_ssid=0 \n \# Use WPA2 \n wpa=2 \n \# Use a pre-shared key \n wpa_key_mgmt=WPA-PSK \n \# The network passphrase \n wpa_passphrase=$wpapass \n \# Use AES, instead of TKIP \n rsn_pairwise=CCMP \n" > /etc/hostapd/hostapd.conf
 
     #Check if it's working
     sudo /usr/sbin/hostapd /etc/hostapd/hostapd.conf
@@ -54,7 +54,7 @@ if [[ $prompt =~ [yY](es)* ]] then
     
     # Configure dnsmasq
     sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig  
-    echo "interface=wlan0 \n \# Use interface wlan0 \n listen-address= $staticip \n \# Explicitly specify the address to listen on \n bind-interfaces \# Bind to the interface to make sure we aren't sending things elsewhere \n server=127.0.0.1 \n \# Forward DNS requests? \n domain-needed \# Don't forward short names \n bogus-priv \# Never forward addresses in the non-routed address spaces.\n  dhcp-range=$rangemin,$rangemax,12h \# Assign IP addresses within range with a 12 hour lease time \n  " > /etc/dnsmasq.conf 
+    echo -e "interface=wlan0 \n \# Use interface wlan0 \n listen-address= $staticip \n \# Explicitly specify the address to listen on \n bind-interfaces \# Bind to the interface to make sure we aren't sending things elsewhere \n server=127.0.0.1 \n \# Forward DNS requests? \n domain-needed \# Don't forward short names \n bogus-priv \# Never forward addresses in the non-routed address spaces.\n  dhcp-range=$rangemin,$rangemax,12h \# Assign IP addresses within range with a 12 hour lease time \n  " > /etc/dnsmasq.conf 
     
     # Set up IPv4 forwarding
     sed -i 's/\#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
