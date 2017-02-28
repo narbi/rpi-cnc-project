@@ -36,7 +36,7 @@ if [[ $prompt =~ [yY](es)* ]] then
     
     echo -e "Configuring static IP and DHCP settings.."
     sudo echo 'denyinterfaces wlan0' >> /etc/dhcpcd.conf  
-    sudo echo -e 'allow-hotplug wlan0\niface wlan0 inet static\n\taddress $staticip\n\tnetmask 255.255.255.0\n\tnetwork $networkip\n\tbroadcast $broadcastip\n#wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf' >> /etc/network/interfaces
+    sudo echo -e "allow-hotplug wlan0\niface wlan0 inet static\n\taddress $staticip\n\tnetmask 255.255.255.0\n\tnetwork $networkip\n\tbroadcast $broadcastip\n#wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf" >> /etc/network/interfaces
     sudo service dhcpcd restart
     sudo ifdown wlan0 
     sudo ifup wlan0
