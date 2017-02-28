@@ -8,13 +8,13 @@
 if [[ "$(ping -c 1 8.8.8.8 | grep '100% packet loss' )" != "" ]]; then
     echo "Internet isn't present, please connect and try again"
     exit 1
-
+fi
 # PACKAGES Update & Install dnsmasq for DNS server and Access Point 
-sudo apt-get update -y
+#sudo apt-get update -y
 sudo apt-get install dnsutils dnsmasq hostapd -y
 
-#
-read -p "Please connect via ethernet to continue and press y <y/N> " prompt
+echo -e "Please connect via ethernet to continue and press y <y/N> " 
+read prompt
 if [[ $prompt =~ [yY](es)* ]] then
     #static IP addr to work as DHCP server and network and broadcast IPs
     echo -e "What is the static IP you would you like to give to this device? (eg. 192.168.66.100)" 
@@ -37,14 +37,14 @@ if [[ $prompt =~ [yY](es)* ]] then
     # Create the records
     # sudo echo 'search $domainname \n nameserver 127.0.0.1' >> /etc/resolv.conf
     sudo echo 'denyinterfaces wlan0' >> /etc/dhcpcd.conf  
-    sudo echo -e 'allow-hotplug wlan0 \n iface wlan0 inet static \n\t address $staticip \n\t netmask 255.255.255.0 \n\t network $networkip \n\t broadcast $broadcastip \n # wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf' >> /etc/network/interfaces
+    sudo echo -e 'allow-hotplug wlan0\niface wlan0 inet static\n\taddress $staticip\n\tnetmask 255.255.255.0\n\tnetwork $networkip\n\tbroadcast $broadcastip\n#wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf' >> /etc/network/interfaces
     sudo service dhcpcd restart
     sudo ifdown wlan0 
     sudo ifup wlan0
 
     # content to hostapd.conf
     # sudo touch /etc/hostapd/hostapd.conf
-    echo -e "# WiFi Interface \n interface=wlan0 \n # Use the nl80211 driver with the brcmfmac driver \n driver=nl80211 \n # This is the name of the network \n ssid=$myssid \n # Use the 2.4GHz band \n hw_mode=g \n # Use channel 6 \n channel=6 \n # Enable 802.11n \n ieee80211n=1 \n # Enable WMM \n wmm_enabled=1 \n # Enable 40MHz channels with 20ns guard interval \n  ht_capab=[HT40][SHORT-GI-20][DSSS_CCK-40] \n # Accept all MAC addresses \n macaddr_acl=0 \n # Use WPA authentication \n auth_algs=1 \n # Require clients to know the network name \n ignore_broadcast_ssid=0 \n # Use WPA2 \n wpa=2 \n # Use a pre-shared key \n wpa_key_mgmt=WPA-PSK \n # The network passphrase \n wpa_passphrase=$wpapass \n # Use AES, instead of TKIP \n rsn_pairwise=CCMP \n" > /etc/hostapd/hostapd.conf
+    echo -e "#WiFi Interface\ninterface=wlan0\n#Use the nl80211 driver with the brcmfmac driver\ndriver=nl80211\n#This is the name of the network\nssid=$myssid\n#Use the 2.4GHz band\nhw_mode=g\n#Use channel 6\nchannel=6\n#Enable 802.11n\nieee80211n=1\n#Enable WMM\nwmm_enabled=1\n# Enable 40MHz channels with 20ns guard interval\nht_capab=[HT40][SHORT-GI-20][DSSS_CCK-40]\n#Accept all MAC addresses\nmacaddr_acl=0\n#Use WPA authentication\nauth_algs=1\n#Require clients to know the network name\nignore_broadcast_ssid=0\n#Use WPA2\nwpa=2\n# Use a pre-shared key\nwpa_key_mgmt=WPA-PSK\n#The network passphrase\nwpa_passphrase=$wpapass\n#Use AES, instead of TKIP\nrsn_pairwise=CCMP \n" > /etc/hostapd/hostapd.conf
 
     #Check if it's working
     sudo /usr/sbin/hostapd /etc/hostapd/hostapd.conf
