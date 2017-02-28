@@ -34,28 +34,29 @@ if [[ $prompt =~ [yY](es)* ]] then
     echo -e "What is the max IP you would like the DHCP server to assign ? (eg. 192.168.66.200)" 
     read rangemax
     
-    # Create the records
-    # sudo echo 'search $domainname \n nameserver 127.0.0.1' >> /etc/resolv.conf
+    echo -e "Configuring static IP and DHCP settings.."
     sudo echo 'denyinterfaces wlan0' >> /etc/dhcpcd.conf  
     sudo echo -e 'allow-hotplug wlan0\niface wlan0 inet static\n\taddress $staticip\n\tnetmask 255.255.255.0\n\tnetwork $networkip\n\tbroadcast $broadcastip\n#wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf' >> /etc/network/interfaces
     sudo service dhcpcd restart
     sudo ifdown wlan0 
     sudo ifup wlan0
-
-    # content to hostapd.conf
-    # sudo touch /etc/hostapd/hostapd.conf
+    
+    echo -e "Setting up the hostapd configuration file.."
     echo -e "#WiFi Interface\ninterface=wlan0\n#Use the nl80211 driver with the brcmfmac driver\ndriver=nl80211\n#This is the name of the network\nssid=$myssid\n#Use the 2.4GHz band\nhw_mode=g\n#Use channel 6\nchannel=6\n#Enable 802.11n\nieee80211n=1\n#Enable WMM\nwmm_enabled=1\n# Enable 40MHz channels with 20ns guard interval\nht_capab=[HT40][SHORT-GI-20][DSSS_CCK-40]\n#Accept all MAC addresses\nmacaddr_acl=0\n#Use WPA authentication\nauth_algs=1\n#Require clients to know the network name\nignore_broadcast_ssid=0\n#Use WPA2\nwpa=2\n# Use a pre-shared key\nwpa_key_mgmt=WPA-PSK\n#The network passphrase\nwpa_passphrase=$wpapass\n#Use AES, instead of TKIP\nrsn_pairwise=CCMP \n" > /etc/hostapd/hostapd.conf
 
     #Check if it's working
+    echo -e "Checking hostapd is working correctly.."
     sudo /usr/sbin/hostapd /etc/hostapd/hostapd.conf
     # find  #DAEMON_CONF="" and replace it with DAEMON_CONF="/etc/hostapd/hostapd.conf" in /etc/default/hostapd 
     sed -i 's/\#DAEMON_CONF=""/DAEMON_CONF="\/etc\/hostapd\/hostapd\.conf"/g' /etc/default/hostapd
     
     # Configure dnsmasq
+    echo -e "Configuring dnsmasq.."
     sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig  
-    echo -e "interface=wlan0 \n # Use interface wlan0 \n listen-address= $staticip \n # Explicitly specify the address to listen on \n bind-interfaces # Bind to the interface to make sure we aren't sending things elsewhere \n server=127.0.0.1 \n # Forward DNS requests? \n domain-needed # Don't forward short names \n bogus-priv # Never forward addresses in the non-routed address spaces.\n  dhcp-range=$rangemin,$rangemax,12h # Assign IP addresses within range with a 12 hour lease time \n" > /etc/dnsmasq.conf 
+    echo -e "interface=wlan0\n#Use interface wlan0\nlisten-address= $staticip\n # Explicitly specify the address to listen on\nbind-interfaces\n# Bind to the interface to make sure we aren't sending things elsewhere\nserver=127.0.0.1\n# Forward DNS requests? \n domain-needed # Don't forward short names\nbogus-priv # Never forward addresses in the non-routed address spaces.\ndhcp-range=$rangemin,$rangemax,12h # Assign IP addresses within range with a 12 hour lease time\n" > /etc/dnsmasq.conf 
     
     # Set up IPv4 forwarding
+    echo -e "Setting up IPv4.."
     sed -i 's/\#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
     sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
     sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE  
