@@ -3,6 +3,7 @@
 # Author: Christina Skouloudi
 # Year: 2017
 # https://frillip.com/using-your-raspberry-pi-3-as-a-wifi-access-point-with-hostapd/
+# http://elinux.org/RPI-Wireless-Hotspot
 
 # Basics - Check connection, then update
 if [[ "$(ping -c 1 8.8.8.8 | grep '100% packet loss' )" != "" ]]; then
@@ -11,7 +12,7 @@ if [[ "$(ping -c 1 8.8.8.8 | grep '100% packet loss' )" != "" ]]; then
 fi
 # PACKAGES Update & Install dnsmasq for DNS server and Access Point 
 #sudo apt-get update -y
-sudo apt-get install dnsutils dnsmasq hostapd -y
+sudo apt-get install dnsutils dnsmasq hostapd udhcpd -y
 
 echo -e "Please connect via ethernet to continue and press y <y/N> " 
 read prompt
@@ -20,6 +21,7 @@ if [[ $prompt =~ [yY](es)* ]] then
     echo -e "What is the static IP you would you like to give to this device? (eg. 192.168.66.100)" 
     read staticip
     networkip = echo $staticip | sed 's/\.[0-9]*$/.0/';
+    routerip = echo $staticip | sed 's/\.[0-9]*$/.1/';
     broadcastip = echo $staticip | sed 's/\.[0-9]*$/.255/';
     
     echo -e "What is the SSID of the local network you will connect?" 
@@ -33,6 +35,10 @@ if [[ $prompt =~ [yY](es)* ]] then
     
     echo -e "What is the max IP you would like the DHCP server to assign ? (eg. 192.168.66.200)" 
     read rangemax
+    
+    # Configure udhcpd
+    sudo echo -e "start $rangemin # This is the range of IPs that the hostspot will give to client devices.\nend $rangemax\ninterface wlan0 # The device uDHCP listens on.\nremaining yes\nopt dns 127.0.0.1 # The DNS servers client devices will use.\n opt subnet 255.255.255.0\nopt router $routerip # The Pi's IP address on wlan0.\nopt lease 864000 # 10 day DHCP lease time in seconds" >> /etc/udhcpd.conf 
+    sed -i 's/DHCPD_ENABLED="no"/\#DHCPD_ENABLED="no"/g' /etc/default/udhcpd 
     
     echo -e "Configuring static IP and DHCP settings.."
     sudo echo 'denyinterfaces wlan0' >> /etc/dhcpcd.conf  
@@ -62,10 +68,16 @@ if [[ $prompt =~ [yY](es)* ]] then
     sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE  
     sudo iptables -A FORWARD -i eth0 -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT  
     sudo iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT  
+    sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
+    sudo echo -e "up iptables-restore < /etc/iptables.ipv4.nat" >> /etc/network/interfaces 
 
     # restart everything 
     sudo service hostapd start  
     sudo service dnsmasq start  
+    sudo service udhcpd start
+    
+    sudo update-rc.d hostapd enable
+    sudo update-rc.d udhcpd enable
     
 else 
     exit 1
