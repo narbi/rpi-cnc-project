@@ -70,7 +70,7 @@ cd Mirai-Source-Code/mirai
 # This was modified to only parse 192.168.66 ips. 
 
 # change dns server to 127.0.0.1 in mirai/bot/resolv.c 
-sed -i -e 's/addr.sin_addr.s_addr = INET_ADDR(8,8,8,8);/addr.sin_addr.s_addr = INET_ADDR(127,0,0,1);/g' /home/pi/mirai/Mirai-Source-Code/mirai/bot/resolv.c
+sed -i -e 's/addr.sin_addr.s_addr = INET_ADDR(8,8,8,8);/addr.sin_addr.s_addr = INET_ADDR(127,0,0,1);/g' ~/mirai/Mirai-Source-Code/mirai/bot/resolv.c
 
 echo -e "Please give the domain name of the CNC"
 read $domainname 
