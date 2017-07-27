@@ -1,5 +1,5 @@
 #!/bin/bash
-# Description: This script will setup a mirai cnc on a debian 64-bit
+# Description: This script will setup a mirai cnc on a debian 64-bit (run with sudo)
 # Author: Christina Skouloudi
 # Year: 2017
 
