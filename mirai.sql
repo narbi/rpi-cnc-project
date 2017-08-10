@@ -1,7 +1,7 @@
-INSERT INTO users VALUES (NULL, 'mirai', 'password', 0, 0, 0, 0, -1, 1, 30, '');
- 
+INSERT INTO users VALUES (NULL, 'root', 'password', 0, 0, 0, 0, -1, 1, 30, '');
+
 CREATE DATABASE mirai;
-USE DATABASE mirai;
+USE mirai;
 
 CREATE TABLE `history` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -13,7 +13,7 @@ CREATE TABLE `history` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
 );
- 
+
 CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(32) NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   KEY `username` (`username`)
 );
- 
+
 CREATE TABLE `whitelist` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `prefix` varchar(16) DEFAULT NULL,
