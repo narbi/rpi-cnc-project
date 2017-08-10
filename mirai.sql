@@ -1,4 +1,4 @@
-INSERT INTO users VALUES (NULL, 'mirai', 'changethispass', 0, 0, 0, 0, -1, 1, 30, '');
+INSERT INTO users VALUES (NULL, 'mirai', 'password', 0, 0, 0, 0, -1, 1, 30, '');
  
 CREATE DATABASE mirai;
 USE DATABASE mirai;
